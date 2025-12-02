@@ -1,6 +1,6 @@
 import User from "../models/User.js";
 import dotenv from "dotenv";
-import { generateFakeToken } from "../utils/generateFakeToken.js";
+import { generateAdminToken } from "../utils/generateAdminToken.js";
 
 dotenv.config();
 
@@ -28,6 +28,11 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: "Email already registered" });
     }
 
+     if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters long" });
+    }
     // Create user (tourist by default)
     const user = await User.create({
       name,
@@ -75,24 +80,17 @@ export const loginUser = async (req, res) => {
       email === process.env.ADMIN_EMAIL &&
       password === process.env.ADMIN_PASSWORD
     ) {
-      const adminUser = {
-        id: "admin-fixed-id",
-        name: process.env.ADMIN_NAME || "Admin",
-        email: process.env.ADMIN_EMAIL,
-        role: "admin",
-      };
-
-      // Generate token
-      const token = User.generateFakeToken("admin-fixed-id"); 
-      // OR use your own generateToken function
-
-      return res.json({
-        message: "Admin login successful",
-        user: adminUser,
-        token,
+       return res.json({
+        message: "Admin login success",
+        user: {
+          id: "admin-fixed-id",
+          name: process.env.ADMIN_NAME || "Admin",
+          email: process.env.ADMIN_EMAIL,
+          role: "admin",
+        },
+        token: generateAdminToken(),
       });
     }
-
     /* --------------------------------------------
        2️⃣ NORMAL USER LOGIN (from database)
     -------------------------------------------- */
