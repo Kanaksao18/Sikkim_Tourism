@@ -12,8 +12,7 @@ export default function Navbar() {
     { name: "Explore Monasteries", href: "/explore" },
     { name: "AI Itinerary", href: "/ai-itinerary" },
     { name: "Heritage Archive", href: "/heritage" },
-    { name: "AI Storytelling", href: "/ai-storytelling" }
-
+    { name: "AI Storytelling", href: "/ai-storytelling" },
   ];
 
   return (
@@ -31,8 +30,7 @@ export default function Navbar() {
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex items-center gap-10">
-
-        {/* Links */}
+        
         {navLinks.map((link) => (
           <a
             key={link.name}
@@ -43,14 +41,14 @@ export default function Navbar() {
           </a>
         ))}
 
-        {/* If user is logged in */}
+        {/* USER LOGGED IN */}
         {user ? (
           <div className="relative">
             <button
               onClick={() => setDropdown(!dropdown)}
               className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full hover:bg-gray-200 transition"
             >
-              {/* User Avatar Circle */}
+              {/* Avatar */}
               <div className="w-8 h-8 bg-red-600 text-white flex items-center justify-center rounded-full font-semibold">
                 {user.name.charAt(0).toUpperCase()}
               </div>
@@ -62,9 +60,9 @@ export default function Navbar() {
               <ChevronDown className="w-4 h-4" />
             </button>
 
-            {/* DROPDOWN MENU */}
+            {/* DROPDOWN */}
             {dropdown && (
-              <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg border py-2 z-50 animate-fadeIn">
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-2 z-50">
 
                 <a
                   href="/profile"
@@ -73,12 +71,13 @@ export default function Navbar() {
                   Profile
                 </a>
 
+                {/* ADMIN DASHBOARD */}
                 {user.role === "admin" && (
                   <a
-                    href="/admin/add-monastery"
+                    href="/admin/dashboard"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                   >
-                    Dashboard
+                    Admin Dashboard
                   </a>
                 )}
 
@@ -92,9 +91,10 @@ export default function Navbar() {
               </div>
             )}
           </div>
+
         ) : (
           <>
-            {/* Login */}
+            {/* LOGIN */}
             <a
               href="/login"
               className="text-gray-700 font-medium hover:text-red-600 transition"
@@ -102,7 +102,7 @@ export default function Navbar() {
               Login
             </a>
 
-            {/* Sign Up */}
+            {/* SIGN UP */}
             <a
               href="/signup"
               className="bg-yellow-400 text-gray-900 px-4 py-2 rounded-full font-medium hover:bg-yellow-500 transition"
@@ -113,7 +113,7 @@ export default function Navbar() {
         )}
       </div>
 
-      {/* Mobile Menu Button */}
+      {/* MOBILE MENU BUTTON */}
       <button
         onClick={() => setOpen(!open)}
         className="md:hidden text-gray-800"
@@ -121,7 +121,7 @@ export default function Navbar() {
         {open ? <X size={28} /> : <Menu size={28} />}
       </button>
 
-      {/* Mobile Dropdown */}
+      {/* MOBILE DROPDOWN */}
       {open && (
         <div className="absolute top-20 left-0 w-full bg-white shadow-md py-5 flex flex-col gap-4 px-6 md:hidden">
 
@@ -136,12 +136,23 @@ export default function Navbar() {
             </a>
           ))}
 
-          {/* If logged in on mobile */}
+          {/* MOBILE USER MENU */}
           {user ? (
             <>
               <span className="text-gray-700 text-lg font-medium">
                 Hi, {user.name.split(" ")[0]}
               </span>
+
+              {/* Admin Mobile Link */}
+              {user.role === "admin" && (
+                <a
+                  href="/admin/dashboard"
+                  className="text-gray-700 hover:text-red-600"
+                  onClick={() => setOpen(false)}
+                >
+                  Admin Dashboard
+                </a>
+              )}
 
               <button
                 onClick={() => {
@@ -153,15 +164,6 @@ export default function Navbar() {
                 Logout
               </button>
 
-              {user.role === "admin" && (
-                <a
-                  href="/admin/add-monastery"
-                  className="text-gray-700 font-medium hover:text-red-600"
-                  onClick={() => setOpen(false)}
-                >
-                  Dashboard
-                </a>
-              )}
             </>
           ) : (
             <>
@@ -182,8 +184,10 @@ export default function Navbar() {
               </a>
             </>
           )}
+
         </div>
       )}
+
     </nav>
   );
 }

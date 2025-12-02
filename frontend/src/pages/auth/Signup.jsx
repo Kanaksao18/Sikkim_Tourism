@@ -39,7 +39,7 @@ export default function Signup() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      navigate("/"); // redirect to home
+      navigate("/login"); // redirect to home
     } catch (err) {
       setError("Something went wrong");
     }
