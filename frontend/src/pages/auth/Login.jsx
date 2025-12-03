@@ -33,66 +33,78 @@ export default function Login() {
         return;
       }
 
-      // Save token
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      navigate("/"); // redirect to home
+      navigate("/");
     } catch (err) {
       setError("Something went wrong");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F6F1E9] px-6">
-      <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md">
-
-        <h2 className="text-3xl font-serif font-bold text-center text-gray-800 mb-6">
+    <div
+      className="min-h-screen flex items-center justify-center px-6 bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage:
+          "url('https://t4.ftcdn.net/jpg/06/91/05/19/360_F_691051962_GFhQPOAXABmf7l706q89b2PFh6FnB1kI.jpg')",
+      }}
+    >
+      <div className="backdrop-blur-lg bg-white/20 shadow-2xl border border-white/30 rounded-2xl p-10 w-full max-w-md">
+        
+        <h2 className="text-4xl font-serif font-bold text-center text-red-700 mb-6 drop-shadow-lg">
           Login
         </h2>
 
         {error && (
-          <p className="bg-red-100 text-red-600 px-4 py-2 rounded-lg mb-4">
+          <p className="bg-red-200/80 text-red-800 px-4 py-2 rounded-lg mb-4">
             {error}
           </p>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-5">
+        <form onSubmit={handleLogin} className="space-y-6">
 
           <div>
-            <label className="font-medium">Email</label>
+            <label className="font-medium text-red-700 drop-shadow-md">
+              Email
+            </label>
             <input
               type="email"
               name="email"
               required
               value={form.email}
               onChange={handleChange}
-              className="w-full border px-4 py-2 rounded-lg mt-1"
+              className="w-full border border-white/40 bg-white/60 px-4 py-2 rounded-lg mt-1 focus:outline-none focus:ring-2 focus:ring-red-400"
             />
           </div>
 
           <div>
-            <label className="font-medium">Password</label>
+            <label className="font-medium text-red-700 drop-shadow-md">
+              Password
+            </label>
             <input
               type="password"
               name="password"
               required
               value={form.password}
               onChange={handleChange}
-              className="w-full border px-4 py-2 rounded-lg mt-1"
+              className="w-full border border-white/40 bg-white/60 px-4 py-2 rounded-lg mt-1 focus:outline-none focus:ring-2 focus:ring-red-400"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition"
+            className="w-full bg-red-700 text-white py-3 rounded-lg font-semibold hover:bg-red-900 transition-transform hover:scale-[1.02]"
           >
             Login
           </button>
 
-          <p className="text-center text-gray-600 mt-2">
+          <p className="text-center text-red-100 drop-shadow-md mt-2">
             Don't have an account?{" "}
-            <a href="/signup" className="text-red-600 font-semibold">
+            <a
+              href="/signup"
+              className="text-yellow-300 font-semibold hover:underline"
+            >
               Sign Up
             </a>
           </p>

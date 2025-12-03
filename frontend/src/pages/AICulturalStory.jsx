@@ -5,64 +5,61 @@ export default function AICulturalStory() {
   const [messages, setMessages] = useState([
     {
       sender: "ai",
-      text: "Namaste 🙏 Tell me which monastery you want to explore through stories. For example: “Tell me a legend from Rumtek Monastery”.",
+      text: "Namaste 🙏 Tell me which monastery you want to explore. Example: “Tell me a legend from Rumtek Monastery”.",
     },
   ]);
+
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voices, setVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState(null);
-  const [speed, setSpeed] = useState(1); // default speed
+  const [speed, setSpeed] = useState(1);
   const [downloading, setDownloading] = useState(false);
-const [listening, setListening] = useState(false);
-const recognitionRef = useRef(null);
+  const [listening, setListening] = useState(false);
+  const recognitionRef = useRef(null);
 
   const chatEndRef = useRef(null);
 
-  // Load available voices on mount
+  // Load voices
   useEffect(() => {
     const loadVoices = () => {
       const availableVoices = window.speechSynthesis.getVoices();
       setVoices(availableVoices);
 
-      // Auto-select a default Indian English voice if available
-      const indianVoice = availableVoices.find((v) =>
-        v.lang.includes("en-IN")
-      );
+      const indianVoice = availableVoices.find((v) => v.lang.includes("en-IN"));
       setSelectedVoice(indianVoice || availableVoices[0] || null);
     };
 
     loadVoices();
     window.speechSynthesis.onvoiceschanged = loadVoices;
   }, []);
-// Initialize Speech Recognition
-useEffect(() => {
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  if (SpeechRecognition) {
-    const recognition = new SpeechRecognition();
-    recognition.lang = "en-IN";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+  // Speech Recognition
+  useEffect(() => {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    recognition.onresult = (event) => {
-      const voiceText = event.results[0][0].transcript;
-      setInput(voiceText);
-      sendMessageFromVoice(voiceText);
-    };
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-IN";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
 
-    recognition.onend = () => {
-      setListening(false);
-    };
+      recognition.onresult = (event) => {
+        const voiceText = event.results[0][0].transcript;
+        setInput(voiceText);
+        sendMessageFromVoice(voiceText);
+      };
 
-    recognitionRef.current = recognition;
-  }
-}, []);
+      recognition.onend = () => setListening(false);
 
-  // Auto-scroll chat
+      recognitionRef.current = recognition;
+    }
+  }, []);
+
+  // Scroll to bottom
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
@@ -88,83 +85,34 @@ useEffect(() => {
 
       const aiMsg = {
         sender: "ai",
-        text: data.story || "I couldn't generate a story at the moment.",
+        text: data.story || "I couldn't generate a story.",
       };
 
       setMessages((prev) => [...prev, aiMsg]);
-    } catch (err) {
+    } catch {
       setMessages((prev) => [
         ...prev,
-        {
-          sender: "ai",
-          text: "Something went wrong. Please try again.",
-        },
+        { sender: "ai", text: "Something went wrong." },
       ]);
     }
 
     setLoading(false);
   };
 
-  // ======== VOICE NARRATION LOGIC ========
-  const getLastAiMessage = () => {
-    const reversed = [...messages].reverse();
-    return reversed.find((m) => m.sender === "ai")?.text || "";
-  };
-  const handleDownloadAudio = async () => {
-  const text = getLastAiMessage();
-  if (!text) {
-    alert("No AI story available to convert.");
-    return;
-  }
-
-  setDownloading(true);
-
-  try {
-    const res = await fetch("http://localhost:5000/api/ai/story-audio", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok || !data.audioUrl) {
-      alert(data.message || "Failed to generate audio.");
-      setDownloading(false);
-      return;
-    }
-
-    // Trigger download
-    const link = document.createElement("a");
-    link.href = data.audioUrl;
-    link.download = "monastery-story.mp3";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  } catch (err) {
-    alert("Something went wrong while downloading audio.");
-  }
-
-  setDownloading(false);
-};
+  const getLastAiMessage = () =>
+    [...messages].reverse().find((m) => m.sender === "ai")?.text || "";
 
   const handleSpeak = () => {
     const text = getLastAiMessage();
     if (!text) return;
 
-    if (!("speechSynthesis" in window)) {
-      alert("Your browser does not support voice narration.");
-      return;
-    }
-
     window.speechSynthesis.cancel();
 
     const utter = new SpeechSynthesisUtterance(text);
     utter.rate = speed;
-    utter.voice = selectedVoice || null;
+    utter.voice = selectedVoice;
 
     utter.onend = () => setIsSpeaking(false);
-    utter.onerror = () => setIsSpeaking(false);
 
     window.speechSynthesis.speak(utter);
     setIsSpeaking(true);
@@ -174,161 +122,146 @@ useEffect(() => {
     window.speechSynthesis.cancel();
     setIsSpeaking(false);
   };
-  // ========================================
+
+  const handleDownloadAudio = async () => {
+    const text = getLastAiMessage();
+    if (!text) return;
+
+    setDownloading(true);
+
+    try {
+      const res = await fetch("http://localhost:5000/api/ai/story-audio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+
+      const data = await res.json();
+
+      const link = document.createElement("a");
+      link.href = data.audioUrl;
+      link.download = "story.mp3";
+      link.click();
+    } catch {}
+
+    setDownloading(false);
+  };
 
   const startListening = () => {
-  if (!recognitionRef.current) {
-    alert("Voice input not supported in this browser.");
-    return;
-  }
+    if (!recognitionRef.current) return;
 
-  setListening(true);
-  recognitionRef.current.start();
-};
+    setListening(true);
+    recognitionRef.current.start();
+  };
 
-const sendMessageFromVoice = async (voiceText) => {
-  const userMsg = { sender: "user", text: voiceText };
-  setMessages((prev) => [...prev, userMsg]);
+  const sendMessageFromVoice = async (voiceText) => {
+    const userMsg = { sender: "user", text: voiceText };
+    setMessages((prev) => [...prev, userMsg]);
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    const res = await fetch("http://localhost:5000/api/ai/story", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: voiceText }),
-    });
+    try {
+      const res = await fetch("http://localhost:5000/api/ai/story", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: voiceText }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    setMessages((prev) => [
-      ...prev,
-      { sender: "ai", text: data.story || "Story not available." },
-    ]);
-  } catch (err) {
-    setMessages((prev) => [
-      ...prev,
-      { sender: "ai", text: "Error processing voice query." },
-    ]);
-  }
+      setMessages((prev) => [...prev, { sender: "ai", text: data.story }]);
+    } catch {}
 
-  setLoading(false);
-};
+    setLoading(false);
+  };
 
   return (
-    <div className="min-h-screen bg-[#F5F1EB] px-6 md:px-20 py-16">
-      {/* Page Title */}
-      <h1 className="text-center text-4xl md:text-5xl font-serif font-bold text-gray-800">
+    <div className="min-h-screen bg-black text-gray-200 px-6 md:px-20 py-14">
+
+      <h1 className="text-center text-4xl md:text-5xl font-bold text-red-500 drop-shadow mb-3">
         AI Cultural Storytelling
       </h1>
 
-      <p className="text-center text-gray-600 text-lg mt-4 mb-8">
-        Listen to stories, legends & heritage tales from Sikkim’s monasteries.
+      <p className="text-center text-gray-400 mb-8">
+        Discover mystical legends & monastery stories of Sikkim.
       </p>
 
-      <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-xl p-6 border">
+      <div className="max-w-3xl mx-auto bg-[#111] border border-gray-800 rounded-2xl shadow-2xl p-6">
 
-        {/* HEADER + VOICE SETTINGS */}
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-2 text-gray-700">
-            <BookOpen className="text-red-600" />
+        {/* Header */}
+        <div className="flex justify-between items-center mb-5">
+          <div className="flex items-center gap-2 text-gray-300">
+            <BookOpen className="text-red-500" />
             <span className="font-medium">Story Mode</span>
           </div>
 
           <div className="flex gap-3">
-            {/* LISTEN */}
             <button
               onClick={handleSpeak}
-              className="flex items-center gap-2 bg-red-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-700 transition"
+              className="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition flex items-center gap-2"
             >
-              <Volume2 size={18} />
-              {isSpeaking ? "Replay" : "Listen"}
+              <Volume2 size={18} /> {isSpeaking ? "Replay" : "Speak"}
             </button>
 
-            {/* STOP */}
             <button
               onClick={handleStop}
-              className="flex items-center gap-2 bg-gray-200 text-gray-800 px-3 py-2 rounded-lg text-sm hover:bg-gray-300 transition"
+              className="px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-200 transition flex items-center gap-2"
             >
-              <Square size={16} />
-              Stop
+              <Square size={16} /> Stop
             </button>
-            {/* DOWNLOAD */}
-              <button
-    onClick={handleDownloadAudio}
-    disabled={downloading}
-    className="flex items-center gap-2 bg-teal-500 text-white px-3 py-2 rounded-lg text-sm hover:bg-teal-600 disabled:opacity-60 disabled:cursor-not-allowed transition"
-  >
-    {downloading ? (
-      <>
-        <Loader2 className="animate-spin" size={16} />
-        Preparing...
-      </>
-    ) : (
-      <>
-        🎧 Download
-      </>
-    )}
-  </button>
+
+            <button
+              onClick={handleDownloadAudio}
+              disabled={downloading}
+              className="px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition flex items-center gap-2 disabled:opacity-40"
+            >
+              {downloading ? <Loader2 size={16} className="animate-spin" /> : "Download"}
+            </button>
           </div>
         </div>
 
-        {/* VOICE SETTINGS */}
-        <div className="bg-gray-50 p-4 rounded-xl mb-6 border space-y-4">
-          <h3 className="flex items-center gap-2 text-gray-700 font-medium">
-            <Settings size={18} className="text-gray-600" /> Voice Options
+        {/* Voice Options */}
+        <div className="bg-[#0d0d0d] border border-gray-800 p-4 rounded-xl mb-6">
+          <h3 className="flex items-center gap-2 text-gray-300 font-medium mb-3">
+            <Settings size={18} className="text-gray-400" /> Voice Settings
           </h3>
 
-          {/* VOICE SELECTION */}
-          <div>
-            <label className="text-sm font-medium text-gray-700">Voice</label>
-            <select
-              className="w-full border px-3 py-2 rounded-lg mt-1"
-              value={selectedVoice?.name}
-              onChange={(e) => {
-                const v = voices.find((voice) => voice.name === e.target.value);
-                setSelectedVoice(v);
-              }}
-            >
-              {voices.map((voice, idx) => (
-                <option key={idx} value={voice.name}>
-                  {voice.name} — ({voice.lang})
-                </option>
-              ))}
-            </select>
-          </div>
+          <label className="text-sm text-gray-400">Voice</label>
+          <select
+            className="w-full bg-black border border-gray-700 text-gray-200 p-2 rounded-lg mt-1"
+            value={selectedVoice?.name}
+            onChange={(e) =>
+              setSelectedVoice(voices.find((v) => v.name === e.target.value))
+            }
+          >
+            {voices.map((voice, idx) => (
+              <option key={idx} value={voice.name}>
+                {voice.name} ({voice.lang})
+              </option>
+            ))}
+          </select>
 
-          {/* SPEED SELECTION */}
-          <div>
-            <label className="text-sm font-medium text-gray-700">
-              Narration Speed
-            </label>
-            <select
-              value={speed}
-              onChange={(e) => setSpeed(Number(e.target.value))}
-              className="w-full border px-3 py-2 rounded-lg mt-1"
-            >
-              <option value="0.8">Slow</option>
-              <option value="1">Normal</option>
-              <option value="1.3">Fast</option>
-            </select>
-          </div>
+          <label className="text-sm text-gray-400 mt-3 block">Speed</label>
+          <select
+            value={speed}
+            onChange={(e) => setSpeed(Number(e.target.value))}
+            className="w-full bg-black border border-gray-700 text-gray-200 p-2 rounded-lg mt-1"
+          >
+            <option value="0.8">Slow</option>
+            <option value="1">Normal</option>
+            <option value="1.3">Fast</option>
+          </select>
         </div>
 
-        {/* CHAT WINDOW */}
-        <div className="h-[60vh] md:h-[65vh] overflow-y-auto px-2 space-y-4 pb-4 border-t pt-4">
+        {/* Chat Window */}
+        <div className="h-[60vh] overflow-y-auto px-2 space-y-4 border-t border-gray-800 pt-4">
           {messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`flex ${
-                msg.sender === "user" ? "justify-end" : "justify-start"
-              }`}
-            >
+            <div key={idx} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
               <div
-                className={`max-w-[75%] p-4 rounded-2xl leading-relaxed ${
+                className={`max-w-[75%] p-4 rounded-2xl ${
                   msg.sender === "user"
                     ? "bg-red-600 text-white rounded-br-none"
-                    : "bg-gray-100 border rounded-bl-none text-gray-700"
+                    : "bg-gray-900 border border-gray-700 text-gray-300 rounded-bl-none"
                 }`}
               >
                 {msg.text}
@@ -338,9 +271,9 @@ const sendMessageFromVoice = async (voiceText) => {
 
           {loading && (
             <div className="flex justify-start">
-              <div className="bg-gray-200 px-4 py-2 rounded-xl flex items-center gap-2 text-gray-700">
-                <Loader2 className="animate-spin" size={20} />
-                AI is narrating…
+              <div className="bg-gray-800 px-4 py-2 rounded-xl text-gray-300 flex items-center gap-2">
+                <Loader2 size={20} className="animate-spin" />
+                Thinking…
               </div>
             </div>
           )}
@@ -348,29 +281,28 @@ const sendMessageFromVoice = async (voiceText) => {
           <div ref={chatEndRef} />
         </div>
 
-        {/* INPUT */}
-        <div className="mt-4 flex items-center gap-3">
-            {/* Microphone Button */}
-  <button
-    onMouseDown={startListening}
-    onTouchStart={startListening}
-    className={`p-3 rounded-xl transition text-white 
-      ${listening ? "bg-red-700 animate-pulse" : "bg-red-500 hover:bg-red-600"}`}
-  >
-    🎤
-  </button>
+        {/* Input */}
+        <div className="mt-4 flex gap-3">
+          <button
+            onMouseDown={startListening}
+            className={`p-3 rounded-xl ${
+              listening ? "bg-red-700 animate-pulse" : "bg-red-600 hover:bg-red-700"
+            } text-white`}
+          >
+            🎤
+          </button>
+
           <input
-            type="text"
             value={input}
-            placeholder="Ask for a monastery story..."
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-            className="flex-1 border px-4 py-3 rounded-xl focus:ring focus:ring-red-200"
+            placeholder="Ask a monastery story..."
+            className="flex-1 bg-black border border-gray-700 text-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-red-500"
           />
 
           <button
             onClick={sendMessage}
-            className="bg-red-600 text-white p-3 rounded-xl hover:bg-red-700 transition"
+            className="bg-red-600 hover:bg-red-700 text-white p-3 rounded-xl transition"
           >
             <Send size={22} />
           </button>

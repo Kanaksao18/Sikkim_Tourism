@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 // Pages
@@ -16,53 +16,71 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AddMonastery from "./pages/admin/AddMonastery";
 // Profile
 import UserProfile from "./pages/profile/UserProfile";
+import Footer from "./components/Footer.jsx";
+
+function LayoutWithFooter() {
+  const location = useLocation();
+
+  // Hide footer on login & signup routes
+  const hideFooter =
+    location.pathname === "/login" || location.pathname === "/signup";
+
+  return (
+    <>
+      <Navbar />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Home />} />
+        <Route path="/explore" element={<Explore />} />
+        <Route path="/ai-itinerary" element={<AIItinerary />} />
+        <Route path="/heritage" element={<Heritage />} />
+        <Route path="/ai-storytelling" element={<AICulturalStory />} />
+
+        {/* Auth Routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
+        {/* Protected: User */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Protected: Admin */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/add-monastery"
+          element={
+            <AdminRoute>
+              <AddMonastery />
+            </AdminRoute>
+          }
+        />
+      </Routes>
+
+      {/* Show footer only when NOT login/signup */}
+      {!hideFooter && <Footer />}
+    </>
+  );
+}
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <Navbar />
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/explore" element={<Explore />} />
-          <Route path="/ai-itinerary" element={<AIItinerary />} />
-          <Route path="/heritage" element={<Heritage />} />
-          <Route path="/ai-storytelling" element={<AICulturalStory />} />
-
-          {/* Auth Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-
-          {/* Protected: User */}
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <UserProfile />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Protected: Admin */}
-          <Route
-            path="/admin/dashboard"
-            element={
-              <AdminRoute>
-                <AdminDashboard />
-              </AdminRoute>
-            }
-          />
-
-          <Route
-            path="/admin/add-monastery"
-            element={
-              <AdminRoute>
-                <AddMonastery />
-              </AdminRoute>
-            }
-          />
-        </Routes>
+        <LayoutWithFooter />
       </Router>
     </AuthProvider>
   );
