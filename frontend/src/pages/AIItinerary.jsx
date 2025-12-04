@@ -1,5 +1,16 @@
 import { useState } from "react";
-import { Loader2, Map, Sparkles, Mountain, Compass } from "lucide-react";
+import {
+  Loader2,
+  Map,
+  Sparkles,
+  Mountain,
+  Compass,
+  Building2,
+  Camera,
+  Book,
+  Leaf,
+  Calendar,
+} from "lucide-react";
 
 export default function AIItinerary() {
   const [days, setDays] = useState(3);
@@ -9,17 +20,19 @@ export default function AIItinerary() {
   const [result, setResult] = useState("");
 
   const interestOptions = [
-    { name: "Architecture", icon: <BuildingIcon /> },
-    { name: "Festivals", icon: <Sparkles /> },
-    { name: "Photography", icon: <CameraIcon /> },
-    { name: "Meditation", icon: <Mountain /> },
-    { name: "History", icon: <BookIcon /> },
-    { name: "Nature", icon: <LeafIcon /> },
+    { name: "Architecture", icon: Building2 },
+    { name: "Festivals", icon: Sparkles },
+    { name: "Photography", icon: Camera },
+    { name: "Meditation", icon: Mountain },
+    { name: "History", icon: Book },
+    { name: "Nature", icon: Leaf },
   ];
 
   const toggleInterest = (name) => {
     setInterests((prev) =>
-      prev.includes(name) ? prev.filter((x) => x !== name) : [...prev, name]
+      prev.includes(name)
+        ? prev.filter((x) => x !== name)
+        : [...prev, name]
     );
   };
 
@@ -49,6 +62,7 @@ export default function AIItinerary() {
 
   return (
     <div className="min-h-screen bg-[#F5F1EB] px-6 md:px-20 py-16">
+      {/* HEADING */}
       <h1 className="text-center text-4xl md:text-5xl font-serif font-bold text-gray-800">
         AI Itinerary Planner
       </h1>
@@ -63,7 +77,7 @@ export default function AIItinerary() {
         {/* DAYS SELECTION */}
         <div>
           <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
-            <CalendarIcon /> Trip Duration
+            <Calendar /> Trip Duration
           </h2>
 
           <select
@@ -71,11 +85,11 @@ export default function AIItinerary() {
             onChange={(e) => setDays(Number(e.target.value))}
             className="w-full border px-4 py-3 rounded-lg focus:ring focus:ring-red-200"
           >
-            <option value="1">1 Day</option>
-            <option value="2">2 Days</option>
-            <option value="3">3 Days</option>
-            <option value="4">4 Days</option>
-            <option value="5">5 Days</option>
+            {[1, 2, 3, 4, 5].map((n) => (
+              <option key={n} value={n}>
+                {n} Day{n > 1 ? "s" : ""}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -86,20 +100,24 @@ export default function AIItinerary() {
           </h2>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {interestOptions.map((item, idx) => (
-              <button
-                key={idx}
-                onClick={() => toggleInterest(item.name)}
-                className={`flex items-center gap-3 p-4 rounded-xl border transition ${
-                  interests.includes(item.name)
-                    ? "bg-red-600 text-white border-red-600"
-                    : "bg-gray-100 hover:bg-gray-200"
-                }`}
-              >
-                <div className="text-xl">{item.icon}</div>
-                {item.name}
-              </button>
-            ))}
+            {interestOptions.map((item) => {
+              const SelectedIcon = item.icon;
+              const active = interests.includes(item.name);
+              return (
+                <button
+                  key={item.name}
+                  onClick={() => toggleInterest(item.name)}
+                  className={`flex items-center gap-3 p-4 rounded-xl border transition shadow-sm ${
+                    active
+                      ? "bg-red-600 text-white border-red-600 shadow-md"
+                      : "bg-gray-100 hover:bg-gray-200"
+                  }`}
+                >
+                  <SelectedIcon size={22} />
+                  {item.name}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -114,10 +132,11 @@ export default function AIItinerary() {
             onChange={(e) => setStartLocation(e.target.value)}
             className="w-full border px-4 py-3 rounded-lg focus:ring focus:ring-red-200"
           >
-            <option value="Gangtok">Gangtok</option>
-            <option value="Pelling">Pelling</option>
-            <option value="Yuksom">Yuksom</option>
-            <option value="Namchi">Namchi</option>
+            {["Gangtok", "Pelling", "Yuksom", "Namchi"].map((loc) => (
+              <option key={loc} value={loc}>
+                {loc}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -140,30 +159,11 @@ export default function AIItinerary() {
 
       {/* RESULT CARD */}
       {result && (
-        <div className="mt-10 bg-white p-8 rounded-2xl shadow-lg max-w-4xl mx-auto border leading-relaxed">
-          <h2 className="text-2xl font-serif font-bold mb-4">
-            Your AI-Generated Journey
-          </h2>
+        <div className="mt-10 bg-white p-8 rounded-2xl shadow-lg max-w-4xl mx-auto border leading-relaxed animation-fadeIn">
+          <h2 className="text-2xl font-serif font-bold mb-4">Your AI-Generated Journey</h2>
           <p className="text-gray-700 whitespace-pre-line">{result}</p>
         </div>
       )}
     </div>
   );
-}
-
-/* ICON FALLBACKS */
-function BuildingIcon() {
-  return <span className="text-lg">🏯</span>;
-}
-function CameraIcon() {
-  return <span className="text-lg">📸</span>;
-}
-function BookIcon() {
-  return <span className="text-lg">📘</span>;
-}
-function LeafIcon() {
-  return <span className="text-lg">🍃</span>;
-}
-function CalendarIcon() {
-  return <span className="text-lg">📅</span>;
 }

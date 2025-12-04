@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 
 export default function AddMonastery() {
   const { token } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -12,8 +13,8 @@ export default function AddMonastery() {
     district: "",
     sect: "",
     description: "",
-    visitingTimings: "",
-    accessDifficulty: "",
+    difficulty: "",
+    image: "",
   });
 
   const handleChange = (e) => {
@@ -22,13 +23,38 @@ export default function AddMonastery() {
 
   const submitForm = async (e) => {
     e.preventDefault();
+    
+    // Validation
+    if (!form.name || !form.sect || !form.district) {
+      alert("Please fill in all required fields: Name, Sect, and District");
+      return;
+    }
+
+    if (!token) {
+      alert("You must be logged in to add a monastery. Please login first.");
+      return;
+    }
+
+    setLoading(true);
     try {
+      // Prepare data to match the model schema
+      const monasteryData = {
+        name: form.name,
+        sect: form.sect,
+        district: form.district,
+        foundedYear: form.foundedYear ? parseInt(form.foundedYear) : undefined,
+        description: form.description,
+        difficulty: form.difficulty || "Easy Access",
+        image: form.image || "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=800", // Default image if not provided
+      };
+
       const res = await axios.post(
         "http://localhost:5000/api/monasteries",
-        form,
+        monasteryData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
@@ -40,13 +66,37 @@ export default function AddMonastery() {
         district: "",
         sect: "",
         description: "",
-        visitingTimings: "",
-        accessDifficulty: "",
+        difficulty: "",
+        image: "",
       });
 
     } catch (err) {
-      console.error(err);
-      alert("Failed to add monastery");
+      console.error("Error details:", err);
+      
+      let errorMessage = "Failed to add monastery";
+      
+      if (err.code === "ECONNREFUSED" || err.message.includes("Network Error")) {
+        errorMessage = "Cannot connect to server. Please make sure the backend server is running on http://localhost:5000";
+      } else if (err.response) {
+        // Server responded with error
+        if (err.response.status === 401) {
+          errorMessage = "Authentication failed. Please login again.";
+        } else if (err.response.status === 403) {
+          errorMessage = "Access denied. Admin privileges required.";
+        } else if (err.response.status === 400) {
+          errorMessage = err.response.data?.error || "Invalid data. Please check all fields.";
+        } else {
+          errorMessage = err.response.data?.error || err.response.data?.message || `Server error: ${err.response.status}`;
+        }
+      } else if (err.request) {
+        errorMessage = "No response from server. Check if backend is running.";
+      } else {
+        errorMessage = err.message || "An unexpected error occurred";
+      }
+      
+      alert(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -154,16 +204,19 @@ export default function AddMonastery() {
           <div className="grid md:grid-cols-2 gap-10">
             <div>
               <label className="block text-lg font-medium text-gray-800 mb-2">
-                Visiting Timings
+                Image URL
               </label>
               <input
-                type="text"
-                name="visitingTimings"
-                value={form.visitingTimings}
+                type="url"
+                name="image"
+                value={form.image}
                 onChange={handleChange}
                 className="w-full bg-[#F9F7F3] border border-[#e0dad1] p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400"
-                placeholder="e.g., 6:00 AM – 6:00 PM"
+                placeholder="https://example.com/image.jpg"
               />
+              <p className="text-sm text-gray-500 mt-1">
+                Enter a valid image URL (will use default if left empty)
+              </p>
             </div>
 
             <div>
@@ -171,8 +224,8 @@ export default function AddMonastery() {
                 Access Difficulty
               </label>
               <select
-                name="accessDifficulty"
-                value={form.accessDifficulty}
+                name="difficulty"
+                value={form.difficulty}
                 onChange={handleChange}
                 className="w-full bg-[#F9F7F3] border border-[#e0dad1] p-4 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-400"
               >
@@ -187,9 +240,10 @@ export default function AddMonastery() {
           {/* Submit Button */}
           <button
             type="submit"
-            className="flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-xl text-lg font-medium shadow-md transition"
+            disabled={loading}
+            className="flex items-center gap-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-8 py-4 rounded-xl text-lg font-medium shadow-md transition"
           >
-            <Save size={20} /> Save Monastery
+            <Save size={20} /> {loading ? "Saving..." : "Save Monastery"}
           </button>
 
         </form>

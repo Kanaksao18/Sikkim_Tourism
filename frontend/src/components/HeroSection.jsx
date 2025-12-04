@@ -31,12 +31,12 @@ export default function HeroSection() {
             Explore Monasteries →
           </a>
 
-          <a
+          {/* <a
             href="/ai-itinerary"
             className="border border-gray-200 text-white px-8 py-3 rounded-lg text-lg font-medium backdrop-blur-sm bg-white/10 hover:bg-white/20 transition flex items-center gap-2"
           >
             ✨ AI Itinerary
-          </a>
+          </a> */}
         </div>
       </div>
     </section>
