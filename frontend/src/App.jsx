@@ -4,8 +4,10 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 // Pages
 import Home from "./pages/Home";
 import Explore from "./pages/Explore";
-import AIItinerary from "./pages/AIItinerary";
+// import AIItinerary from "./pages/AIItinerary";
 import Heritage from "./pages/Heritage";
+import TourGuide from "./pages/TourGuide";
+
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import AICulturalStory from "./pages/AICulturalStory";
@@ -32,9 +34,10 @@ function LayoutWithFooter() {
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/explore" element={<Explore />} />
-        <Route path="/ai-itinerary" element={<AIItinerary />} />
+        
         <Route path="/heritage" element={<Heritage />} />
         <Route path="/ai-storytelling" element={<AICulturalStory />} />
+        <Route path="/tour-guide" element={<TourGuide />} />
 
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
