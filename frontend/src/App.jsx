@@ -4,18 +4,18 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 // Pages
 import Home from "./pages/Home";
 import Explore from "./pages/Explore";
-// import AIItinerary from "./pages/AIItinerary";
 import Heritage from "./pages/Heritage";
-import TourGuide from "./pages/TourGuide";
-
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import AICulturalStory from "./pages/AICulturalStory";
+import TourGuide from "./pages/TourGuide";
 // Admin + Protected
 import AdminRoute from "./components/AdminRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AddMonastery from "./pages/admin/AddMonastery";
+import ManageMonasteries from "./pages/admin/ManageMonasteries";
+import EditMonastery from "./pages/admin/EditMonastery";
 // Profile
 import UserProfile from "./pages/profile/UserProfile";
 import Footer from "./components/Footer.jsx";
@@ -34,7 +34,6 @@ function LayoutWithFooter() {
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/explore" element={<Explore />} />
-        
         <Route path="/heritage" element={<Heritage />} />
         <Route path="/ai-storytelling" element={<AICulturalStory />} />
         <Route path="/tour-guide" element={<TourGuide />} />
@@ -68,6 +67,24 @@ function LayoutWithFooter() {
           element={
             <AdminRoute>
               <AddMonastery />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/monasteries"
+          element={
+            <AdminRoute>
+              <ManageMonasteries />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/edit-monastery/:id"
+          element={
+            <AdminRoute>
+              <EditMonastery />
             </AdminRoute>
           }
         />
