@@ -7,9 +7,26 @@ export const protect = async (req, res, next) => {
     if (!token) return res.status(401).json({ message: "Not authorized" });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Handle admin user (not in database)
+    if (decoded.id === "admin-fixed-id" && decoded.role === "admin") {
+      req.user = {
+        id: "admin-fixed-id",
+        role: "admin",
+        email: process.env.ADMIN_EMAIL,
+        name: process.env.ADMIN_NAME || "Admin",
+      };
+      return next();
+    }
+    
+    // Handle regular users from database
     req.user = await User.findById(decoded.id).select("-password");
+    if (!req.user) {
+      return res.status(401).json({ message: "User not found" });
+    }
     next();
-  } catch {
+  } catch (err) {
+    console.error("Auth middleware error:", err);
     res.status(401).json({ message: "Not authorized" });
   }
 };

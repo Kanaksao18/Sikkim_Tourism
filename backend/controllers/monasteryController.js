@@ -24,9 +24,15 @@ export const getMonasteries = async (req, res) => {
 export const getMonastery = async (req, res) => {
   try {
     const monastery = await Monastery.findById(req.params.id);
+    if (!monastery) {
+      return res.status(404).json({ error: "Monastery not found" });
+    }
     res.json(monastery);
   } catch (err) {
-    res.status(404).json({ error: "Monastery not found" });
+    if (err.name === "CastError") {
+      return res.status(400).json({ error: "Invalid monastery ID" });
+    }
+    res.status(500).json({ error: "Failed to fetch monastery" });
   }
 };
 
@@ -36,7 +42,13 @@ export const createMonastery = async (req, res) => {
     const monastery = await Monastery.create(req.body);
     res.status(201).json(monastery);
   } catch (err) {
-    res.status(400).json({ error: "Failed to create monastery" });
+    console.error("Create monastery error:", err);
+    // Provide more specific error messages
+    if (err.name === "ValidationError") {
+      const errors = Object.values(err.errors).map(e => e.message).join(", ");
+      return res.status(400).json({ error: `Validation error: ${errors}` });
+    }
+    res.status(400).json({ error: err.message || "Failed to create monastery" });
   }
 };
 
@@ -46,20 +58,38 @@ export const updateMonastery = async (req, res) => {
     const monastery = await Monastery.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true }
+      { new: true, runValidators: true }
     );
+    if (!monastery) {
+      return res.status(404).json({ error: "Monastery not found" });
+    }
     res.json(monastery);
-  } catch {
-    res.status(400).json({ error: "Failed to update monastery" });
+  } catch (err) {
+    console.error("Update monastery error:", err);
+    if (err.name === "CastError") {
+      return res.status(400).json({ error: "Invalid monastery ID" });
+    }
+    if (err.name === "ValidationError") {
+      const errors = Object.values(err.errors).map(e => e.message).join(", ");
+      return res.status(400).json({ error: `Validation error: ${errors}` });
+    }
+    res.status(400).json({ error: err.message || "Failed to update monastery" });
   }
 };
 
 // DELETE
 export const deleteMonastery = async (req, res) => {
   try {
-    await Monastery.findByIdAndDelete(req.params.id);
-    res.json({ message: "Monastery deleted" });
-  } catch {
-    res.status(400).json({ error: "Failed to delete monastery" });
+    const monastery = await Monastery.findByIdAndDelete(req.params.id);
+    if (!monastery) {
+      return res.status(404).json({ error: "Monastery not found" });
+    }
+    res.json({ message: "Monastery deleted successfully" });
+  } catch (err) {
+    console.error("Delete monastery error:", err);
+    if (err.name === "CastError") {
+      return res.status(400).json({ error: "Invalid monastery ID" });
+    }
+    res.status(400).json({ error: err.message || "Failed to delete monastery" });
   }
 };
