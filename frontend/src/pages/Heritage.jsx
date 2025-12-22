@@ -1,4 +1,6 @@
-import heroImg from "../assets/hero.png";
+import heroImg1 from "../assets/hero.png";
+import heroImg2 from "../assets/hero.jpg";
+import heroImg3 from "../assets/s1.jpg";
 
 const featuredPlaces = [
   {
@@ -7,209 +9,140 @@ const featuredPlaces = [
     highlight: "One of the most important seats of Tibetan Buddhism in Sikkim.",
     details:
       "Known for its golden stupa, intricate murals and daily monk prayers, Rumtek blends spiritual energy with stunning valley views.",
+    img: heroImg1,
   },
   {
     name: "Rabdentse Ruins",
     region: "Pelling, West Sikkim",
     highlight: "The former capital of the Kingdom of Sikkim.",
     details:
-      "Stone ruins surrounded by forest with panoramic views of Khangchendzonga, perfect for history lovers and photographers.",
+      "Stone ruins surrounded by forest with panoramic views of Khangchendzonga.",
+    img: heroImg2,
   },
   {
     name: "Buddha Park (Tathagata Tsal)",
     region: "Ravangla, South Sikkim",
     highlight: "A towering statue of Buddha with manicured gardens.",
     details:
-      "A peaceful complex with walking paths, gallery and wide angle views of the snow peaks on a clear day.",
+      "A peaceful complex with walking paths and wide-angle mountain views.",
+    img: heroImg3,
   },
   {
     name: "Khecheopalri Lake",
     region: "Near Pelling, West Sikkim",
     highlight: "A sacred wish-fulfilling lake for Buddhists and Hindus.",
     details:
-      "Surrounded by forested hills and prayer flags, the lake is known for its mirror‑like surface and birdlife.",
+      "Surrounded by forested hills, prayer flags and serene beauty.",
+    img: heroImg1,
   },
 ];
 
-const heritageVideos = [
-  {
-    title: "Sikkim Heritage & Monasteries",
-    description: "A visual journey through key monasteries and heritage spots.",
-    youtubeId: "dQw4w9WgXcQ", // placeholder ID – replace with real travel video ID
-  },
-  {
-    title: "Best Places to Visit in Sikkim",
-    description: "Overview of popular destinations across East, West, North & South Sikkim.",
-    youtubeId: "oHg5SJYRHA0", // placeholder ID
-  },
-];
-
-const heritageTrails = [
-  {
-    title: "Monastery Trail",
-    days: "2–3 Days",
-    description:
-      "Focus on Rumtek, Pemayangtse, Tashiding and nearby village walks for a deeply spiritual circuit.",
-  },
-  {
-    title: "Lakes & Sacred Landscapes",
-    days: "2–4 Days",
-    description:
-      "Combine Khecheopalri Lake, Tsomgo Lake and surrounding viewpoints for a nature‑centered heritage trip.",
-  },
-  {
-    title: "History & Old Capitals",
-    days: "2–3 Days",
-    description:
-      "Explore Rabdentse Ruins, Yuksom and nearby sites to trace the story of the Sikkim kingdom.",
-  },
-];
+const HERO_VIDEO_ID = "Sf3oM2JS5h8";
 
 const Heritage = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FDF6EE] via-[#F5F1EB] to-[#F0F4FF] px-6 md:px-16 lg:px-24 py-16">
-      {/* Hero */}
-      <header className="max-w-5xl mx-auto text-center mb-14">
-        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-red-500 mb-3">
-          Sikkim Heritage Archive
-        </p>
-        <h1 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-4 leading-tight">
-          Discover the{" "}
-          <span className="bg-gradient-to-r from-red-600 via-amber-500 to-emerald-500 bg-clip-text text-transparent">
-            soul of Sikkim
-          </span>{" "}
-          through its sacred sites.
-        </h1>
-        <p className="text-gray-600 text-lg max-w-3xl mx-auto">
-          Explore the most iconic monasteries, lakes and historic ruins of Sikkim
-          with stories, visuals and curated videos to bring each place alive.
-        </p>
-      </header>
+    <div className="bg-white min-h-screen pb-20">
 
-      <main className="max-w-6xl mx-auto space-y-12">
-        {/* Featured Places */}
-        <section className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm border border-red-50 p-6 md:p-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-            <div>
-              <h2 className="text-2xl font-serif font-semibold text-gray-900">
-                Best Heritage Places in Sikkim
-              </h2>
-              <p className="text-sm text-gray-600 mt-1">
-                A starting list of must‑visit cultural and spiritual sites.
-              </p>
-            </div>
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-xs font-semibold text-red-700">
-              ✓ Handpicked highlights
-            </span>
-          </div>
+      {/* 🔥 HERO SECTION WITH ZOOMED BACKGROUND VIDEO */}
+      <div className="relative w-full h-[480px] md:h-[600px] overflow-hidden">
 
-          <div className="grid gap-6 md:grid-cols-2">
+        {/* ZOOMED VIDEO BACKGROUND */}
+        <iframe
+          className="absolute inset-0 w-full h-full object-cover scale-[1.7]"
+          src={`https://www.youtube.com/embed/${HERO_VIDEO_ID}?autoplay=1&mute=1&loop=1&playlist=${HERO_VIDEO_ID}&controls=0&showinfo=0&modestbranding=1`}
+          allow="autoplay; encrypted-media"
+        />
+
+        {/* LIGHT OVERLAY FOR READABILITY */}
+        <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px]"></div>
+
+        {/* HERO TEXT */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.35em] text-red-600">
+            Sikkim Heritage Archive
+          </p>
+
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 leading-tight mt-3">
+            Discover the <span className="text-red-600">Soul of Sikkim</span>
+          </h1>
+
+          <p className="text-gray-700 text-lg max-w-2xl mt-4">
+            Explore monasteries, lakes and ancient capitals through curated stories and immersive visuals.
+          </p>
+        </div>
+      </div>
+
+      {/* MAIN CONTENT */}
+      <main className="max-w-7xl mx-auto px-6 mt-12">
+
+        {/* 🏔 FEATURED PLACES */}
+        <section>
+          <h2 className="text-3xl font-serif font-semibold text-gray-900 mb-6">
+            Featured Heritage Places
+          </h2>
+
+          <div className="grid gap-10 md:grid-cols-2">
             {featuredPlaces.map((place) => (
               <article
                 key={place.name}
-                className="bg-[#FFFDF9] rounded-xl overflow-hidden border border-amber-100 hover:border-amber-300 hover:shadow-md transition"
+                className="rounded-2xl overflow-hidden bg-white border border-gray-200 shadow-md hover:shadow-xl transition"
               >
-                <div className="h-40 relative">
+                {/* IMAGE */}
+                <div className="h-72 relative">
                   <img
-                    src={heroImg}
+                    src={place.img}
                     alt={place.name}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
-                  <div className="absolute bottom-3 left-4 right-4">
-                    <p className="text-[11px] uppercase tracking-[0.2em] text-amber-200">
-                      {place.region}
-                    </p>
-                    <h3 className="text-lg font-semibold text-white">
-                      {place.name}
-                    </h3>
+
+                  <div className="absolute bottom-4 left-5 bg-black/50 text-white px-3 py-1 rounded-lg text-sm">
+                    {place.region}
                   </div>
                 </div>
-                <div className="p-4 space-y-2 text-sm text-gray-700">
-                  <p className="font-semibold text-gray-900">{place.highlight}</p>
-                  <p>{place.details}</p>
+
+                {/* TEXT */}
+                <div className="p-5 space-y-2">
+                  <h3 className="text-xl font-semibold text-gray-900">{place.name}</h3>
+                  <p className="font-medium text-red-600">{place.highlight}</p>
+                  <p className="text-gray-700">{place.details}</p>
                 </div>
               </article>
             ))}
           </div>
         </section>
 
-        {/* Video Gallery */}
-        <section className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm border border-sky-50 p-6 md:p-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-            <div>
-              <h2 className="text-2xl font-serif font-semibold text-gray-900">
-                Watch &amp; Experience Sikkim
-              </h2>
-              <p className="text-sm text-gray-600 mt-1">
-                Short films and travel videos that capture the essence of the land,
-                monasteries and mountains.
-              </p>
-            </div>
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 text-xs font-semibold text-sky-800">
-              🎥 Visual stories
-            </span>
-          </div>
+        {/* 🧭 HERITAGE TRAILS */}
+        <section className="mt-20">
+          <h2 className="text-3xl font-serif font-semibold text-gray-900 mb-6">
+            Plan Your Heritage Trails
+          </h2>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            {heritageVideos.map((video) => (
-              <article
-                key={video.youtubeId}
-                className="rounded-xl overflow-hidden border border-sky-100 bg-[#F9FCFF]"
-              >
-                <div className="aspect-video bg-black/5">
-                  <iframe
-                    className="w-full h-full"
-                    src={`https://www.youtube.com/embed/${video.youtubeId}`}
-                    title={video.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                  />
-                </div>
-                <div className="p-4 space-y-1 text-sm text-gray-700">
-                  <h3 className="font-semibold text-gray-900">{video.title}</h3>
-                  <p>{video.description}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        {/* Heritage Trails / How to Use This Archive */}
-        <section className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm border border-emerald-50 p-6 md:p-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-            <div>
-              <h2 className="text-2xl font-serif font-semibold text-gray-900">
-                Plan Your Heritage Trail
-              </h2>
-              <p className="text-sm text-gray-600 mt-1">
-                Use these sample ideas to connect the places and videos into an easy route.
-              </p>
-            </div>
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-xs font-semibold text-emerald-700">
-              ✓ Beginner‑friendly circuits
-            </span>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            {heritageTrails.map((trail) => (
-              <article
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                title: "Monastery Trail",
+                days: "2–3 Days",
+                text: "Rumtek, Pemayangtse, Tashiding & village walks.",
+              },
+              {
+                title: "Lakes & Sacred Landscapes",
+                days: "2–4 Days",
+                text: "Khecheopalri, Tsomgo & viewpoints.",
+              },
+              {
+                title: "History & Old Capitals",
+                days: "2–3 Days",
+                text: "Rabdentse, Yuksom & heritage sites.",
+              },
+            ].map((trail) => (
+              <div
                 key={trail.title}
-                className="rounded-xl border border-emerald-100 bg-[#F7FFF9] p-4 hover:border-emerald-300 hover:shadow-md transition flex flex-col justify-between"
+                className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-xl transition"
               >
-                <div className="space-y-2 text-sm text-gray-700">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-500">
-                    {trail.days}
-                  </p>
-                  <h3 className="text-base font-semibold text-gray-900">
-                    {trail.title}
-                  </h3>
-                  <p>{trail.description}</p>
-                </div>
-                <p className="mt-3 text-[11px] text-emerald-700 font-medium">
-                  Tip: Pair this with the Tour Guide page to align regions and seasons.
-                </p>
-              </article>
+                <p className="text-xs uppercase font-bold text-green-700">{trail.days}</p>
+                <h3 className="text-xl font-semibold text-gray-900 mt-1">{trail.title}</h3>
+                <p className="text-gray-700 mt-2">{trail.text}</p>
+              </div>
             ))}
           </div>
         </section>
